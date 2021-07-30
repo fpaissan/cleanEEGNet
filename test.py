@@ -1,4 +1,4 @@
-from models.CNN_chocolate import ConvNet
+from models.cleanEEGNet import ConvNet
 from torch.utils.data import DataLoader
 from utils.data_utils import EEGDataset
 import utils.trainer as trainer
