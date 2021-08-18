@@ -1,5 +1,5 @@
 from pytorch_lightning import LightningModule
-from CNN_chocolate import ConvNet
+from _modules.CNN_chocolate import ConvNet
 from loss import custom_loss
 import torchmetrics
 import params as p
@@ -8,12 +8,19 @@ import torch
 
 class cleanEEGNet(LightningModule):
     def __init__(self):
+        
         super().__init__()
         self.f1 = torchmetrics.classification.f_beta.F1()
         self.model = ConvNet()
 
     def forward(self, x):
-        return self.model(x)
+        e = torch.zeros(x.shape[0],x.shape[1],62)
+        for i_b, batch in enumerate(x):
+            for i_e, epoch in enumerate(batch):
+                e[i_b,i_e,:] = (self.model.forward(epoch.view(1,1,epoch.shape[0],epoch.shape[1])))
+
+        print(e.shape)
+        return e
     
     def loss_fn(self, y_hat, y_target):
         loss = custom_loss()
@@ -28,6 +35,7 @@ class cleanEEGNet(LightningModule):
 
     def training_step(self, batch, batch_idx):
         x, label = batch
+        print(x,label)
         output = self(x.float())
         
         loss = self.loss_fn(output, label.int())

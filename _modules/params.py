@@ -7,8 +7,8 @@ debug = False
 
 log_dir = "tb_log/"
 ckp_dir = "ckp/"
-k_w = 2500  # Kernel width for model CNN_vanilla.py
-s_w = 1250  # Stride width fot model CNN_vanilla.py
+k_w = 256  # Kernel width for model CNN_vanilla.py
+s_w = 128  # Stride width fot model CNN_vanilla.py
 
 ch_out1 = 32  # Output channels for CNN_chocolate.py
 
@@ -36,3 +36,7 @@ pos_weight = tot_bad_channels / tot_good_channels
 dp_rate = 0 # Dropout rate
 weigth_decay = 1e-5  # Weight decay factor on Adam
 lr = 2e-2
+
+sampleRate = 512
+overlap = 0.5
+windowLength = 5 #in seconds

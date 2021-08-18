@@ -14,11 +14,11 @@ class ConvNet(nn.Module):
         self.conv2 = nn.Conv2d(in_channels=p.ch_out1, out_channels=1, kernel_size=(1, 1), stride=(1, 1))
         self.bn2 = nn.BatchNorm2d(1, False)
         
-        self.avgpool = nn.AvgPool2d(kernel_size=(1, 239))
+        self.avgpool = nn.AvgPool2d(kernel_size=(1, 19))
 
     def forward(self, x):
+
         x = F.pad(x, (0, 0, 1, 1), mode='replicate')
-        
         x = self.conv(x)
         x = F.relu(x)
         x = self.bn1(x)
@@ -29,6 +29,14 @@ class ConvNet(nn.Module):
         x = F.dropout(x, p.dp_rate)
 
         x = self.avgpool(x)
-        x = torch.reshape(x, (x.shape[0], x.shape[2]))
-
+        x = x[0,0,:,0]
         return x
+
+
+
+
+
+
+
+
+

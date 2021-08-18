@@ -1,4 +1,7 @@
 
+import pickle
+import torch
+from torch import FloatTensor
 from torch.utils.data import Dataset, DataLoader, Subset
 from sklearn.model_selection import LeavePGroupsOut
 from pytorch_lightning import LightningDataModule
@@ -8,6 +11,7 @@ from pathlib import Path
 from torch import Tensor
 from typing import Tuple
 import numpy as np
+import params as p
 
 
 class EEGDataset(Dataset):
@@ -17,11 +21,15 @@ class EEGDataset(Dataset):
         self.data_dir = parent_dir.joinpath(split)
         self.files = sorted(self.data_dir.iterdir())
 
+    def __init__(self, dir) -> None:
+        self.data_dir = Path(dir)
+        self.files = sorted(self.data_dir.iterdir())
+
     def __len__(self) -> int:
         return int(len(self.files)/2)
 
-    def __getitem__(self,
-                    i: int) -> Tuple[np.array, np.array]:
+    def __getitem__(self, i: int):
+        print(i)
         fname = str(self.files[i].name).split('_')[:-1]
         label_path = self.files[i].parents[0].joinpath('_'.join(fname + ['labels.pkl']))
         data_path = self.files[i].parents[0].joinpath('_'.join(fname + ['data.pkl']))
@@ -29,13 +37,25 @@ class EEGDataset(Dataset):
         # Load data
         with open(data_path, "rb") as f:
             data = p_load(f)[:, 0:330000]
+    
+        windowSampleNum = p.sampleRate * p.windowLength
+        windowedData = torch.FloatTensor(data[:,0:windowSampleNum]).unsqueeze(0)
+        slidingIndex = int(windowSampleNum * p.overlap)
 
+        while(slidingIndex < 330000 - windowSampleNum):
+            windowedData  = torch.cat((windowedData, (torch.FloatTensor(data[:,slidingIndex:slidingIndex+windowSampleNum]).unsqueeze(0))),0)
+            slidingIndex += int(windowSampleNum * p.overlap)
+        
         # Load label
         with open(label_path, "rb") as f:
-            labels = p_load(f)
+            ch_labels = p_load(f)
 
-        data = zscore(data)
-        data = np.expand_dims(data, 0)
+        labels = torch.ones((windowedData.shape[0],windowedData.shape[1]))
+        for i in range(ch_labels.shape[0]) :
+            labels[i,:] *= ch_labels[i]
+        
+        data = zscore(windowedData)
+        data = windowedData.unsqueeze(0)
         return data, labels
 
 
@@ -64,11 +84,12 @@ class EEGDataModule(LightningDataModule):
 
     def setup(self, stage=None):
         self.train_set, self.val_set = self._dataset_split(
-            EEGDataset(Path("/badchannel"), "train"), 
+            EEGDataset(p.path), 
             ratio=0.8
             )
 
-        self.test_set = EEGDataset(Path("/badchannel"), "test")
+        self.test_set = EEGDataset(p.test_path)
+
 
     def train_dataloader(self) -> DataLoader:
         return DataLoader(self.train_set, self.batch_size, num_workers=4, persistent_workers=True)
@@ -78,3 +99,12 @@ class EEGDataModule(LightningDataModule):
 
     def test_dataloader(self) -> DataLoader:
         return DataLoader(self.test_set, self.batch_size, num_workers=4, persistent_workers=True)
+
+    def save_files(self):
+        root = "./badchannels/"
+        #train set
+        for i in range(len(self.train_set)):
+            print((self.train_set[i])[0].shape)
+
+
+
