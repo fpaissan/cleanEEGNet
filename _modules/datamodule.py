@@ -4,6 +4,7 @@ from sklearn.model_selection import LeavePGroupsOut
 from pytorch_lightning import LightningDataModule
 from pickle import load as p_load
 from scipy.stats import zscore
+from numpy import unique
 from pathlib import Path
 from torch import Tensor
 from typing import Tuple
@@ -16,15 +17,18 @@ class EEGDataset(Dataset):
                 split: str) -> None:
         self.data_dir = parent_dir.joinpath(split)
         self.files = sorted(self.data_dir.iterdir())
+        self.files = unique(
+            ['_'.join(str(f.name).split('_')[:-1]) for f in self.files]
+        )
+        print(self.files)
 
     def __len__(self) -> int:
-        return int(len(self.files)/2)
+        return len(self.files)
 
     def __getitem__(self,
                     i: int) -> Tuple[np.array, np.array]:
-        fname = str(self.files[i].name).split('_')[:-1]
-        label_path = self.files[i].parents[0].joinpath('_'.join(fname + ['labels.pkl']))
-        data_path = self.files[i].parents[0].joinpath('_'.join(fname + ['data.pkl']))
+        label_path = self.data_dir.joinpath('_'.join([self.files[i]] + ['labels.pkl']))
+        data_path = self.data_dir.joinpath('_'.join([self.files[i]] + ['data.pkl']))
 
         # Load data
         with open(data_path, "rb") as f:
@@ -51,7 +55,7 @@ class EEGDataModule(LightningDataModule):
         Performs GroupSplit to avoid having the same subject in train and val
         """
         # Extracts sub IDs from filename
-        groups = [str(f.name).split("_")[0] for f in dataset.files]
+        groups = [str(f).split("_")[0] for f in dataset.files]
         # Splits based on group
         splitter = LeavePGroupsOut(n_groups=int(np.ceil(len(np.unique(groups))*ratio)))
         temp = list(splitter.split(dataset.files, groups=groups))
