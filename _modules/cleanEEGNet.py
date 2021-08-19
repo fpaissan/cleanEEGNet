@@ -18,8 +18,7 @@ class cleanEEGNet(LightningModule):
         for i_b, batch in enumerate(x):
             for i_e, epoch in enumerate(batch):
                 output[i_b,:] += self.model.forward(epoch.view(1,1,epoch.shape[0],epoch.shape[1]))
-                output /= i_e
-
+        output /= i_e
         print("shape output: ", output.shape)        
         return output
     
@@ -53,6 +52,7 @@ class cleanEEGNet(LightningModule):
 
     def validation_step(self, batch, batch_idx):
         x, label = batch
+        label = label[:,1]
         output = self(x.float())
 
         loss = self.loss_fn(output, label.int())
@@ -67,6 +67,7 @@ class cleanEEGNet(LightningModule):
 
     def test_step(self, batch, batch_idx):
         x, label = batch
+        label = label[:,1]
         output = self(x.float())
 
         loss = self.loss_fn(output, label.int())
