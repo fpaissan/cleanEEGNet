@@ -17,10 +17,10 @@ class cleanEEGNet(LightningModule):
         output = torch.zeros(x.shape[0],x.shape[2]).to(p.device) # (n_batches, n_channels)
         for i_b, batch in enumerate(x):
             for i_e, epoch in enumerate(batch):
-                print(epoch.shape)
                 output[i_b,:] += self.model.forward(epoch.view(1,1,epoch.shape[0],epoch.shape[1]))
-        
-        print(output.shape)
+                output /= i_e
+
+        print("shape output: ", output.shape)        
         return output
     
     def loss_fn(self, y_hat, y_target):
@@ -37,6 +37,7 @@ class cleanEEGNet(LightningModule):
     def training_step(self, batch, batch_idx):
         x, label = batch
         label = label[:,1]
+        print("shape target ",label.shape)
 
         output = self(x.float())
         
