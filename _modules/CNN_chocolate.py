@@ -17,7 +17,6 @@ class ConvNet(nn.Module):
         self.avgpool = nn.AvgPool2d(kernel_size=(1, 19))
 
     def forward(self, x):
-
         x = F.pad(x, (0, 0, 1, 1), mode='replicate')
         x = self.conv(x)
         x = F.relu(x)

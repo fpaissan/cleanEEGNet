@@ -1,7 +1,7 @@
 import torch
 
-path = "/data/disk0/volkan/fpaissan_bc/data_pkl"
-test_path = "/data/disk0/volkan/fpaissan_bc/test_set"
+path = "/data/disk0/volkan/mbrugnara/train"
+test_path = "/data/disk0/volkan/mbrugnara/test"
 
 debug = False
 
