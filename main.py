@@ -14,12 +14,6 @@ data_module = EEGDataModule(2)
 
 os.environ['WANDB_MODE'] = "online" 
 
-'''dataset = EEGDataset(p.path)
-for i in range(len(dataset)):
-        print(dataset[i][1][:,1])'''
-
-
-
 checkpoint_callback = pl.callbacks.ModelCheckpoint(
         monitor='val_loss',
         dirpath='./ckp',
