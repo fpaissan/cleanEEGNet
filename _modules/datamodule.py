@@ -12,6 +12,7 @@ from torch import Tensor
 from typing import Tuple
 import numpy as np
 import params as p
+from numpy import unique
 
 
 class EEGDataset(Dataset):
@@ -20,18 +21,25 @@ class EEGDataset(Dataset):
                 split: str) -> None:
         self.data_dir = parent_dir.joinpath(split)
         self.files = sorted(self.data_dir.iterdir())
+        self.files = unique(
+            ['_'.join(str(f.name).split('_')[:-1]) for f in self.files]
+        )
+        print(self.files)
 
     def __init__(self, dir) -> None:
         self.data_dir = Path(dir)
         self.files = sorted(self.data_dir.iterdir())
+        self.files = unique(
+            ['_'.join(str(f.name).split('_')[:-1]) for f in self.files]
+        )
 
     def __len__(self) -> int:
         return int(len(self.files)/2)
 
-    def __getitem__(self, i: int):
-        fname = str(self.files[i].name).split('_')[:-1]
-        label_path = self.files[i].parents[0].joinpath('_'.join(fname + ['labels.pkl']))
-        data_path = self.files[i].parents[0].joinpath('_'.join(fname + ['data.pkl']))
+    def __getitem__(self,
+                    i: int) -> Tuple[np.array, np.array]:
+        label_path = self.data_dir.joinpath('_'.join([self.files[i]] + ['labels.pkl']))
+        data_path = self.data_dir.joinpath('_'.join([self.files[i]] + ['data.pkl']))
 
         # Load data
         with open(data_path, "rb") as f:
@@ -41,7 +49,8 @@ class EEGDataset(Dataset):
         with open(label_path, "rb") as f:
             labels = p_load(f)
         
-        data = zscore(data)
+        data /= 100
+        #data = zscore(data)
         #data = np.expand_dims(data,0)
         return data, labels
 
@@ -58,7 +67,7 @@ class EEGDataModule(LightningDataModule):
         Performs GroupSplit to avoid having the same subject in train and val
         """
         # Extracts sub IDs from filename
-        groups = [str(f.name).split("_")[0] for f in dataset.files]
+        groups = [str(f).split("_")[0] for f in dataset.files]
         # Splits based on group
         splitter = LeavePGroupsOut(n_groups=int(np.ceil(len(np.unique(groups))*ratio)))
         temp = list(splitter.split(dataset.files, groups=groups))
@@ -72,7 +81,7 @@ class EEGDataModule(LightningDataModule):
     def setup(self, stage=None):
         self.train_set, self.val_set = self._dataset_split(
             EEGDataset(p.path), 
-            ratio=0.8
+            ratio=0.2
             )
 
         self.test_set = EEGDataset(p.test_path)

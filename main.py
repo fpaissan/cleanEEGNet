@@ -7,15 +7,18 @@ from _modules.datamodule import EEGDataModule, EEGDataset
 from _modules.cleanEEGNet import cleanEEGNet
 
 import params as p
+import os
 
 mod = cleanEEGNet()
-data_module = EEGDataModule(4)
+data_module = EEGDataModule(2)
+
+os.environ['WANDB_MODE'] = "online" 
+
+'''dataset = EEGDataset(p.path)
+for i in range(len(dataset)):
+        print(dataset[i][1][:,1])'''
 
 
-'''convmod = ConvNet()
-data = EEGDataset(p.path)
-x = data[1][0]
-print(mod.forward(x))'''
 
 checkpoint_callback = pl.callbacks.ModelCheckpoint(
         monitor='val_loss',
@@ -24,11 +27,14 @@ checkpoint_callback = pl.callbacks.ModelCheckpoint(
         save_top_k=3,
         mode='min')
 
-#wandb_logger = WandbLogger()
+wandb_logger = WandbLogger()
+
 trainer = pl.Trainer(gpus=1,
                     max_epochs=150,
                     callbacks=[checkpoint_callback],
-                    num_sanity_val_steps=0
+                    num_sanity_val_steps=0,
+                    logger=wandb_logger
+
         )
 
 
