@@ -1,0 +1,24 @@
+{
+    "os": "Linux-4.15.0-118-generic-x86_64-with-debian-buster-sid",
+    "python": "3.7.0",
+    "heartbeatAt": "2021-08-20T12:57:59.639097",
+    "startedAt": "2021-08-20T12:57:57.660009",
+    "docker": null,
+    "gpu": "GeForce GTX 980",
+    "gpu_count": 1,
+    "cpu_count": 8,
+    "cuda": "10.2.89",
+    "args": [],
+    "state": "running",
+    "program": "/home/mbrugnara/cleanEEGNet/main.py",
+    "codePath": "main.py",
+    "git": {
+        "remote": "git@github.com:MicheleBrugnara/cleanEEGNet.git",
+        "commit": "84ad4d1f7d1e98e3e738e3c46b37cc9aed04a63d"
+    },
+    "email": "brugnaramichele@gmail.com",
+    "root": "/home/mbrugnara/cleanEEGNet",
+    "host": "volkan",
+    "username": "mbrugnara",
+    "executable": "/home/mbrugnara/anaconda3/envs/BCD/bin/python"
+}
