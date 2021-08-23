@@ -14,15 +14,19 @@ class cleanEEGNet(LightningModule):
         super().__init__()
         self.f1 = torchmetrics.classification.f_beta.F1()
         self.model = ConvNet()
-        #self.mu = Variable(torch.rand(1,dtype=float).to(p.device), requires_grad=True)
         self.mu = nn.Parameter(torch.rand(1).to(p.device))
+        self.mu_log = torch.zeros(1)
+
     def forward(self, x):
         output = torch.zeros(x.shape[0],x.shape[2]).to(p.device) # (n_batches, n_channels)
         shadow = torch.zeros(x.shape[2]).to(p.device)
+        mu = torch.sigmoid(self.mu).to(p.device)
         for i_b, batch in enumerate(x):
             for i_e, epoch in enumerate(batch):
-                output[i_b,:] = (self.mu * self.model.forward(epoch.view(1,1,epoch.shape[0],epoch.shape[1])) + (1 - self.mu) * shadow)
+                output[i_b,:] = (mu * self.model.forward(epoch.view(1,1,epoch.shape[0],epoch.shape[1])) + (1 - mu) * shadow)
                 shadow = output[i_b,:].clone()
+
+        self.mu_log = mu
         return output
     
     def loss_fn(self, y_hat, y_target):
@@ -48,6 +52,7 @@ class cleanEEGNet(LightningModule):
 
         self.log('train_loss', loss)
         self.log('train_f1', f1)
+        self.log('mu',self.mu_log)
         
         return loss
 

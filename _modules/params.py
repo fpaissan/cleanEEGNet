@@ -33,9 +33,9 @@ tot_good_channels = 5480
 pos_weight = tot_bad_channels / tot_good_channels
 # pos_weight = 1/(tot_bad_channels/(tot_good_channels+tot_bad_channels))/2
 
-dp_rate = 0 # Dropout rate
-weigth_decay = 1e-5  # Weight decay factor on Adam
-lr = 2e-2
+dp_rate = 0.1 # Dropout rate
+weigth_decay = 1e-3  # Weight decay factor on Adam
+lr = 3e-3
 
 sampleRate = 512
 overlap = 0.5

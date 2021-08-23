@@ -12,6 +12,8 @@ import os
 mod = cleanEEGNet()
 data_module = EEGDataModule(2)
 
+
+
 os.environ['WANDB_MODE'] = "online" 
 
 checkpoint_callback = pl.callbacks.ModelCheckpoint(
@@ -24,11 +26,11 @@ checkpoint_callback = pl.callbacks.ModelCheckpoint(
 wandb_logger = WandbLogger()
 
 trainer = pl.Trainer(gpus=1,
-                    max_epochs=150,
+                    max_epochs=70,
                     callbacks=[checkpoint_callback],
                     num_sanity_val_steps=0,
-                    logger=wandb_logger
-
+                    logger=wandb_logger,
+                    log_every_n_steps=10
         )
 
 

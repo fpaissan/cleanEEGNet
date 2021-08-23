@@ -66,6 +66,7 @@ class EEGDataModule(LightningDataModule):
         """
         Performs GroupSplit to avoid having the same subject in train and val
         """
+
         # Extracts sub IDs from filename
         groups = [str(f).split("_")[0] for f in dataset.files]
         # Splits based on group
@@ -84,7 +85,7 @@ class EEGDataModule(LightningDataModule):
             ratio=0.2
             )
 
-        self.test_set = EEGDataset(p.test_path)
+        self.test_set = EEGDataset(p.test_path)        
 
     def train_dataloader(self) -> DataLoader:
         return DataLoader(self.train_set, self.batch_size, num_workers=4, persistent_workers=True)
