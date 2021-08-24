@@ -14,11 +14,15 @@ class ConvNet(nn.Module):
         self.conv2 = nn.Conv2d(in_channels=p.ch_out1, out_channels=1, kernel_size=(1, 1), stride=(1, 1))
         self.bn2 = nn.BatchNorm2d(1, False)
         
-        self.avgpool = nn.AvgPool2d(kernel_size=(1, 19))
+        self.avgpool = nn.AvgPool2d(kernel_size=(1, 9))
+        #self.linear = nn.Linear(6,1)
+
+
 
     def forward(self, x):
         x = F.pad(x, (0, 0, 1, 1), mode='replicate')
         x = self.conv(x)
+        print(x)
         x = F.relu(x)
         x = self.bn1(x)
         x = F.dropout(x, p.dp_rate)
@@ -26,16 +30,7 @@ class ConvNet(nn.Module):
         x = self.conv2(x)
         x = self.bn2(x)
         x = F.dropout(x, p.dp_rate)
-
+        #x = self.linear(x)
         x = self.avgpool(x)
         x = x[0,0,:,0]
         return x
-
-
-
-
-
-
-
-
-

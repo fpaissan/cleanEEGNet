@@ -17,6 +17,9 @@ class cleanEEGNet(LightningModule):
         self.mu = nn.Parameter(-0.35*torch.ones(1).to(p.device))
         self.mu_sigmoid = torch.zeros(1)
 
+        self.null_predictions = 0
+        self.num_predictions = 0
+
     def forward(self, x):
         output = torch.zeros(x.shape[0],x.shape[2]).to(p.device) # (n_batches, n_channels)
         shadow = torch.zeros(x.shape[2]).to(p.device)
@@ -25,7 +28,6 @@ class cleanEEGNet(LightningModule):
             for i_e, epoch in enumerate(batch):
                 output[i_b,:] = (self.mu_sigmoid * self.model.forward(epoch.view(1,1,epoch.shape[0],epoch.shape[1])) + (1 - self.mu_sigmoid) * shadow)
                 shadow = output[i_b,:].clone()
-
         return output
     
     def loss_fn(self, y_hat, y_target):
@@ -52,7 +54,14 @@ class cleanEEGNet(LightningModule):
         self.log('train_loss', loss)
         self.log('train_f1', f1)
         self.log('mu ',self.mu_sigmoid)
+
         
+        '''self.num_predictions += 1
+        if(torch.sum(pred) == 0):
+            self.null_predictions+=1
+
+        print(int(self.null_predictions) , " / ", int(self.num_predictions), " predictions are all 0s")'''
+
         return loss
 
     def validation_step(self, batch, batch_idx):
@@ -63,13 +72,10 @@ class cleanEEGNet(LightningModule):
         loss = self.loss_fn(output, label.int())
 
         pred = torch.round(torch.sigmoid(output))
-        print("prediction ", pred, " labels ", label,self.mu_sigmoid, self.mu)
         f1 = self.f1(torch.flatten(pred), torch.flatten(label).int())
 
         self.log('val_loss', loss)
         self.log('val_f1', f1)
-
-        
 
         return loss, f1
 
