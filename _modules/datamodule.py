@@ -96,3 +96,15 @@ class EEGDataModule(LightningDataModule):
     def test_dataloader(self) -> DataLoader:
         return DataLoader(self.test_set, self.batch_size, num_workers=4, persistent_workers=True)
 
+    def check_balance(self):
+        tot_channels = 0
+        tot_bad_channels = 0
+        for i in range(len(self.train_set)):
+            print(i)
+            labels = self.train_set[i][1][:,1]
+            tot_channels += len(labels)
+            tot_bad_channels += torch.sum(labels)
+        print(tot_bad_channels,tot_channels)
+        return tot_bad_channels/(tot_channels-tot_bad_channels)
+
+
