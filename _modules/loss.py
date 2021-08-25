@@ -47,4 +47,4 @@ def custom_loss():
     """
     bce_loss = torch.nn.BCEWithLogitsLoss(reduction='mean', pos_weight=torch.tensor(pos_weight))
     soft_f1 = macro_double_soft_f1
-    return lambda y_hat, y : 1*bce_loss(y_hat, y.float()) + 0*soft_f1(y_hat, y)
+    return lambda y_hat, y : 0.8*bce_loss(y_hat, y.float()) + 0.2*soft_f1(y_hat, y)
