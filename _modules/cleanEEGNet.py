@@ -46,8 +46,7 @@ class cleanEEGNet(LightningModule):
         label = label[:,:,1]
         output = self(x.float())       
         loss = self.loss_fn(output, label.int())
-        #print("output: ", torch.sigmoid(output), "labels: ", label)
-
+        print("output: ", torch.sigmoid(output), "labels: ", label)
         pred = torch.round(torch.sigmoid(output))
         f1 = self.f1(torch.flatten(pred), torch.flatten(label).int())
 

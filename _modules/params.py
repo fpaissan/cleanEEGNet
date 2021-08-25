@@ -7,7 +7,7 @@ debug = False
 
 log_dir = "tb_log/"
 ckp_dir = "ckp/"
-k_w = 512  # Kernel width for model CNN_vanilla.py
+k_w = 1280  # Kernel width for model CNN_vanilla.py
 s_w = 256  # Stride width fot model CNN_vanilla.py
 
 ch_out1 = 32  # Output channels for CNN_chocolate.py

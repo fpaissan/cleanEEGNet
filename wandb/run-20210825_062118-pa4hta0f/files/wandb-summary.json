@@ -1,0 +1,1 @@
+{"train_loss": 2.4081971645355225, "train_f1": 0.1492537260055542, "mu ": 0.41237151622772217, "epoch": 0, "trainer/global_step": 19, "_runtime": 103, "_timestamp": 1629865381, "_step": 1, "_wandb": {"runtime": 135}}
