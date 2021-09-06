@@ -29,8 +29,8 @@ class ConvNet(nn.Module):
         x = self.bn2(x)
         x = F.dropout(x, p.dp_rate)
 
-        #x = self.avgpool(x)
-        x = self.linear(x)
+        x = self.avgpool(x)
+        #x = self.linear(x)
         x = x[0,0,:,0]
 
         return x

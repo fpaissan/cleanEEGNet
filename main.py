@@ -9,6 +9,9 @@ from _modules.cleanEEGNet import cleanEEGNet
 import params as p
 import os
 
+from pytorch_lightning.callbacks import LearningRateMonitor
+
+
 mod = cleanEEGNet()
 data_module = EEGDataModule(2)
 
@@ -25,11 +28,13 @@ checkpoint_callback = pl.callbacks.ModelCheckpoint(
 
 wandb_logger = WandbLogger()
 
+lr_monitor = LearningRateMonitor(logging_interval='step')
+
 trainer = pl.Trainer(gpus=1,
-                    max_epochs=300,
-                    callbacks=[checkpoint_callback],
+                    max_epochs=70,
+                    callbacks=[checkpoint_callback, lr_monitor],
                     num_sanity_val_steps=0,
-                    logger=wandb_logger,
+                    logger = wandb_logger,
                     log_every_n_steps=10
         )
 

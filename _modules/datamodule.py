@@ -88,7 +88,8 @@ class EEGDataModule(LightningDataModule):
         self.test_set = EEGDataset(p.test_path)        
 
     def train_dataloader(self) -> DataLoader:
-        return DataLoader(self.train_set, self.batch_size, num_workers=4, persistent_workers=True)
+        return DataLoader(self.train_set, self.batch_size, num_workers=4, persistent_workers=True, shuffle = True)
+        #return DataLoader(self.train_set, self.batch_size, num_workers=4, persistent_workers=True)
 
     def val_dataloader(self) -> DataLoader:
         return DataLoader(self.val_set, self.batch_size, num_workers=4, persistent_workers=True)
