@@ -28,6 +28,7 @@ class cleanEEGNet(LightningModule):
             for i_e, epoch in enumerate(batch):
                 #print("std deviation: ",np.std(epoch.cpu().numpy()), " mean: ", np.mean(epoch.cpu().numpy()))
                 input  = torch.from_numpy(zscore(epoch.cpu()))
+                #print(input.shape)
                 #print("norm std deviation: ",np.std(input.numpy()), " norm mean: ", np.mean(input.numpy()))
                 input = input.to(p.device)
                 output[i_b,:] = (self.mu_sigmoid * self.model.forward(input.view(1,1,input.shape[0],input.shape[1])) + (1 - self.mu_sigmoid) * shadow)

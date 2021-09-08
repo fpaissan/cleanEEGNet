@@ -15,8 +15,8 @@ class ConvNet(nn.Module):
         self.bn2 = nn.BatchNorm2d(1, False)
         
         self.avgpool = nn.AvgPool2d(kernel_size=(1, 6))
-        self.linear = nn.Linear(6,1)
-        self.linear.bias.data.fill_(torch.log(torch.from_numpy(np.array(1/p.pos_weight))))
+        #self.linear = nn.Linear(6,1)
+        #self.linear.bias.data.fill_(torch.log(torch.from_numpy(np.array(1/p.pos_weight))))
 
     def forward(self, x):
         x = F.pad(x, (0, 0, 1, 1), mode='replicate')
