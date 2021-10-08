@@ -67,13 +67,16 @@ class EEGDataModule(LightningDataModule):
         return train_split, val_split
 
     def setup(self, stage=None):
-        self.train_set, self.val_set = self._dataset_split(
-            EEGDataset(Path("/badchannel"), "train"), 
-            ratio=0.8
+        if stage == "fit":
+            self.train_set, self.val_set = self._dataset_split(
+                EEGDataset(Path("/badchannel"), "train"), 
+                ratio=0.2
             )
-
-        self.test_set = EEGDataset(Path("/badchannel"), "test")
-
+            
+            print(len(self.train_set), len(self.val_set))
+        elif stage == "test":
+            self.test_set = EEGDataset(Path("/badchannel"), "test")
+    
     def train_dataloader(self) -> DataLoader:
         return DataLoader(self.train_set, self.batch_size, num_workers=4, persistent_workers=True)
 
